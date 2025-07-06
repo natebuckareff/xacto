@@ -23,5 +23,4 @@ tokio = { version = "1.45.1", features = [
 ] }
 tokio-util = "0.7.15"
 slab = "0.4.10"
-parking_lot = "0.12.4"
 anymap = "0.12.1"
