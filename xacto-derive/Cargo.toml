@@ -7,7 +7,7 @@ license = "MIT"
 repository = "https://github.com/natebuckareff/xacto"
 readme = "../README.md"
 keywords = ["actor", "erlang"]
-categories = ["concurrency", "derive"]
+categories = ["concurrency"]
 
 [lib]
 proc-macro = true
