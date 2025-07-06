@@ -2,9 +2,15 @@
 name = "xacto"
 version = "0.1.0"
 edition = "2024"
+description = "Simple Erlang-style actors for Rust."
+license = "MIT"
+repository = "https://github.com/natebuckareff/xacto"
+readme = "../README.md"
+keywords = ["actor", "erlang"]
+categories = ["concurrency"]
 
 [dependencies]
-xacto-derive = { path = "../xacto-derive" }
+xacto-derive = { path = "../xacto-derive", version = "0.1.0" }
 async-trait = "0.1.88"
 futures-util = "0.3.31"
 serde = { version = "1.0.219", features = ["derive"] }

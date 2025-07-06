@@ -2,6 +2,12 @@
 name = "xacto-derive"
 version = "0.1.0"
 edition = "2024"
+description = "Derive macros for xacto."
+license = "MIT"
+repository = "https://github.com/natebuckareff/xacto"
+readme = "../README.md"
+keywords = ["actor", "erlang"]
+categories = ["concurrency", "derive"]
 
 [lib]
 proc-macro = true
