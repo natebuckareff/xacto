@@ -16,7 +16,7 @@ pub trait RpcMessage {
 
     fn into_request(self, proxy: &mut ReplyMap) -> RpcEnvelope<Self::Request>;
 
-    async fn proxy_request<F>(
+    async fn proxy_request<F: Send>(
         env: RpcEnvelope<Self::Request>,
         f: F,
     ) -> Result<Option<RpcEnvelope<Self::Response>>, ()>

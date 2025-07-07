@@ -13,5 +13,5 @@ serde_json = "1.0.140"
 tokio = { version = "1.46.1", features = ["sync"] }
 
 [[example]]
-name = "rpc_message"
-path = "rpc_message.rs"
+name = "end_to_end_rpc_test"
+path = "end_to_end_rpc_test.rs"

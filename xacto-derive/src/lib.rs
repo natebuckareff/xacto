@@ -145,7 +145,7 @@ fn parse_rpc_message(input: DeriveInput) -> Result<TokenStream, Error> {
         .collect::<Vec<_>>();
 
     let request_enum = quote! {
-        #[derive(Debug,Clone, Serialize, Deserialize)]
+        #[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize)]
         pub enum #request_ident {
             #(#request_variants),*
         }
@@ -153,7 +153,7 @@ fn parse_rpc_message(input: DeriveInput) -> Result<TokenStream, Error> {
 
     let response_enum = if !response_variants.is_empty() {
         Some(quote! {
-            #[derive(Debug, Clone, Serialize, Deserialize)]
+            #[derive(Debug, Clone, ::serde::Serialize, ::serde::Deserialize)]
             pub enum #response_ident {
                 #(#response_variants),*
             }
@@ -173,7 +173,7 @@ fn parse_rpc_message(input: DeriveInput) -> Result<TokenStream, Error> {
 
         if mv.response_type.is_none() {
             into_request_arms.push(quote! {
-                #original_arm => RpcEnvelope {
+                #original_arm => ::xacto::RpcEnvelope {
                     id: 0,
                     payload: #request_arm,
                 }
@@ -191,7 +191,7 @@ fn parse_rpc_message(input: DeriveInput) -> Result<TokenStream, Error> {
             into_request_arms.push(quote! {
                 #original_arm => {
                     let id = replies.insert_reply(reply);
-                    RpcEnvelope {
+                    ::xacto::RpcEnvelope {
                         id,
                         payload: #request_arm,
                     }
@@ -200,13 +200,13 @@ fn parse_rpc_message(input: DeriveInput) -> Result<TokenStream, Error> {
 
             proxy_request_arms.push(quote! {
                 #request_arm => {
-                    let (tx, rx) = oneshot::channel();
+                    let (tx, rx) = ::tokio::sync::oneshot::channel();
                     let reply = Reply::new(tx);
                     let msg = #original_arm;
                     let (msg, act) = f(msg).ok_or(())?;
                     act.cast(msg).await.map_err(|_| ())?;
                     let response = rx.await.unwrap();
-                    let env = RpcEnvelope {
+                    let env = ::xacto::RpcEnvelope {
                         id: env.id,
                         payload: #response_arm,
                     };
@@ -243,22 +243,23 @@ fn parse_rpc_message(input: DeriveInput) -> Result<TokenStream, Error> {
     };
 
     let rpc_message_impl = quote! {
-        impl RpcMessage for #ident {
+        #[::async_trait::async_trait]
+        impl ::xacto::RpcMessage for #ident {
             type Request = #request_ident;
             type Response = #response_assoc_type;
 
-            fn into_request(self, replies: &mut ReplyMap) -> RpcEnvelope<Self::Request> {
+            fn into_request(self, replies: &mut ::xacto::ReplyMap) -> ::xacto::RpcEnvelope<Self::Request> {
                 match self {
                     #(#into_request_arms),*
                 }
             }
 
-            async fn proxy_request<F>(
-                env: RpcEnvelope<Self::Request>,
+            async fn proxy_request<F: Send>(
+                env: ::xacto::RpcEnvelope<Self::Request>,
                 f: F,
-            ) -> Result<Option<RpcEnvelope<Self::Response>>, ()>
+            ) -> Result<Option<::xacto::RpcEnvelope<Self::Response>>, ()>
             where
-                F: FnOnce(Self) -> Option<(Self, Act<Self>)>,
+                F: FnOnce(Self) -> Option<(Self, ::xacto::Act<Self>)>,
                 Self: Sized,
             {
                 match env.payload {
@@ -267,8 +268,8 @@ fn parse_rpc_message(input: DeriveInput) -> Result<TokenStream, Error> {
             }
 
             async fn proxy_response(
-                env: RpcEnvelope<Self::Response>,
-                replies: &mut ReplyMap,
+                env: ::xacto::RpcEnvelope<Self::Response>,
+                replies: &mut ::xacto::ReplyMap,
             ) -> Result<(), ()> {
                 #proxy_response_impl
             }

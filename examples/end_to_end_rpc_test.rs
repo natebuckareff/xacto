@@ -1,11 +1,7 @@
-use xacto::{
-    Act, Actor, ActorError, ActorResult, ActorSelf, Reply, ReplyMap, RpcEnvelope, RpcMessage,
-    Scope, ScopeContext,
-};
-use xacto_derive::RpcMessage;
 use async_trait::async_trait;
-use serde::{Deserialize, Serialize};
 use tokio::sync::oneshot;
+use xacto::{Act, Actor, ActorError, ActorResult, ActorSelf, Reply};
+use xacto_derive::RpcMessage;
 
 struct MyActor {
     state: u16,
@@ -74,6 +70,8 @@ impl Actor for MyActor {
 
 #[tokio::main]
 async fn main() -> Result<(), ActorError> {
+    use xacto::*;
+
     let context = ScopeContext::new();
     let mut scope = Scope::new(context);
 
