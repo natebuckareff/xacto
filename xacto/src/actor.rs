@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
-use crate::{act::Act, actor_error::ActorError, actor_self::ActorSelf};
+use crate::{ActorError, ActorSelf};
 
 pub type ActorResult<T = ()> = Result<T, ActorError>;
 
@@ -14,10 +14,13 @@ pub trait Actor: Send + 'static {
     type Args: Send + 'static;
     type Msg: Send + 'static;
 
-    async fn start(act: &Act<Self::Msg>, args: Self::Args) -> ActorResult<Self>
+    async fn start(this: &ActorSelf<Self>, args: Self::Args) -> ActorResult<Self>
     where
         Self: Sized;
 
-    async fn receive(&mut self, this: &ActorSelf, msg: Self::Msg) -> ActorResult;
+    async fn receive(&mut self, this: &ActorSelf<Self>, msg: Self::Msg) -> ActorResult
+    where
+        Self: Sized;
+
     async fn exit(&mut self) -> ActorResult;
 }

@@ -37,17 +37,25 @@ pub struct Act<Msg> {
     tx: mpsc::Sender<ActorSignal<Msg>>,
 }
 
+impl<Msg> std::fmt::Debug for Act<Msg> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Act")
+    }
+}
+
 impl<Msg> Act<Msg> {
-    pub fn new(actor_id: ActorId, tx: mpsc::Sender<ActorSignal<Msg>>) -> Self {
+    pub fn new(tx: mpsc::Sender<ActorSignal<Msg>>) -> Self {
         Self { tx }
+    }
+
+    pub fn tx(&self) -> mpsc::Sender<ActorSignal<Msg>> {
+        self.tx.clone()
     }
 
     fn create_signal(&self, msg: Msg) -> ActorSignal<Msg> {
         ActorSignal::Msg(msg)
     }
-}
 
-impl<Msg> Act<Msg> {
     pub async fn cast(&self, msg: Msg) -> Result<(), SendError<Msg>> {
         let signal = self.create_signal(msg);
         if let Err(e) = self.tx.send(signal).await {

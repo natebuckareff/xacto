@@ -15,3 +15,7 @@ tokio = { version = "1.46.1", features = ["sync"] }
 [[example]]
 name = "end_to_end_rpc_test"
 path = "end_to_end_rpc_test.rs"
+
+[[example]]
+name = "ping_pong_basic"
+path = "ping_pong_basic.rs"

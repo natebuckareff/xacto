@@ -12,6 +12,7 @@ use tokio::{
 use tokio_util::sync::CancellationToken;
 
 use crate::{
+    ActorSelf,
     act::Act,
     actor::{Actor, ActorId},
     actor_task::{ActorTask, ActorTaskError},
@@ -37,6 +38,7 @@ struct ActorState {
     cancel: CancellationToken,
 }
 
+#[derive(Debug)]
 pub enum ActorOutput {
     Success,
     Failed(ActorTaskError),
@@ -102,11 +104,12 @@ impl Scope {
         self.next_actor_id += 1;
 
         let (tx, rx) = mpsc::channel(100);
-        let act = Act::new(id, tx);
+        let act = Act::new(tx.clone());
         let cancel = self.cancel.child_token();
 
-        let task = ActorTask::<A>::new(id, rx, cancel.clone());
-        let task = task.run(act.clone(), args);
+        let this = ActorSelf::new(act.clone(), rx, cancel.clone());
+        let task = ActorTask::<A>::new(this);
+        let task = task.run(args);
 
         let handle = self.join_set.spawn(async move {
             match AssertUnwindSafe(task).catch_unwind().await {

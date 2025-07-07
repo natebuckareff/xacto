@@ -1,6 +1,6 @@
 use async_trait::async_trait;
 use tokio::sync::oneshot;
-use xacto::{Act, Actor, ActorError, ActorResult, ActorSelf, Reply};
+use xacto::{Actor, ActorError, ActorResult, ActorSelf, Reply};
 use xacto_derive::RpcMessage;
 
 struct MyActor {
@@ -28,12 +28,12 @@ impl Actor for MyActor {
     type Msg = MyActorMsg;
     type Args = u16;
 
-    async fn start(_act: &Act<Self::Msg>, args: Self::Args) -> ActorResult<Self> {
+    async fn start(_: &ActorSelf<Self>, args: Self::Args) -> ActorResult<Self> {
         println!("MyActor started");
         Ok(Self { state: args })
     }
 
-    async fn receive(&mut self, _this: &ActorSelf, msg: Self::Msg) -> ActorResult {
+    async fn receive(&mut self, _: &ActorSelf<Self>, msg: Self::Msg) -> ActorResult {
         println!("MyActor receiving messages");
 
         match msg {

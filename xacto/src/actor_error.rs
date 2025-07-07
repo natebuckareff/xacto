@@ -6,6 +6,7 @@ pub enum CallError<M> {
 
 #[derive(Debug)]
 pub enum ActorError {
+    HandleClosed,
     Link(LinkError<(), ()>),
     Send(SendError<()>),
     Recv(RecvError),
@@ -34,6 +35,7 @@ pub enum RecvError {
 impl std::fmt::Display for ActorError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
+            ActorError::HandleClosed => write!(f, "actor handle closed"),
             ActorError::Link(e) => write!(f, "actor link error: {:?}", e),
             ActorError::Send(e) => write!(f, "actor send error: {:?}", e),
             ActorError::Recv(e) => write!(f, "actor recv error: {:?}", e),

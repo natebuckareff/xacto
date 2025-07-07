@@ -1,7 +1,6 @@
 mod act;
 mod actor;
 mod actor_error;
-mod actor_self;
 mod actor_task;
 mod call;
 mod link;
@@ -12,7 +11,6 @@ mod scope;
 pub use act::*;
 pub use actor::*;
 pub use actor_error::*;
-pub use actor_self::*;
 pub use actor_task::*;
 pub use call::*;
 pub use link::*;
