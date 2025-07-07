@@ -179,7 +179,7 @@ impl Scope {
 
     pub async fn exit_and_wait(&mut self) {
         self.cancel.cancel();
-        while let Some(_) = self.next_finished().await {}
+        while self.next_finished().await.is_some() {}
     }
 
     pub fn abort_all(&mut self) {

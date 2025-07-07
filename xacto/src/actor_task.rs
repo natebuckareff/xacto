@@ -28,7 +28,7 @@ impl<A: Actor> ActorSelf<A> {
         &self.act
     }
 
-    pub fn exit(&self) -> () {
+    pub fn exit(&self) {
         self.cancel.cancel();
     }
 }

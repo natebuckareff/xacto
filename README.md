@@ -3,9 +3,10 @@
 Erlang-style actors.
 
 TODO:
-- [ ] Allow actor queue depth to be configured
-- [ ] ActorSelf API for cancelling all pending messages
-- [ ] Bring back actor IDs
+- [ ] Timer events
+- [ ] Allow actor queue depth to be configured (`ActorSpec`?)
+- [ ] ActorSelf API for draining all pending messages
+- [ ] `call()` timeouts
 - [ ] Monitor
 - [ ] Supervisors
 - [ ] Declarative actors (`SupervisorSpec`, `WorkerSpec`, etc)

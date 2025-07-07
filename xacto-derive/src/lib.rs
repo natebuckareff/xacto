@@ -74,7 +74,7 @@ impl MessageVariant {
 pub fn rpc_message(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     match parse_rpc_message(input) {
-        Ok(output) => output.into(),
+        Ok(output) => output,
         Err(error) => error.to_compile_error().into(),
     }
 }
@@ -292,23 +292,18 @@ fn is_reply_type(ty: &Type) -> bool {
         Type::Path(TypePath { qself: None, path }) => path
             .segments
             .last()
-            .map_or(false, |seg| seg.ident == "Reply"),
+            .is_some_and(|seg| seg.ident == "Reply"),
         _ => false,
     }
 }
 
 fn get_inner_reply_type(ty: &Type) -> Result<Type, Error> {
-    match ty {
-        Type::Path(TypePath { qself: None, path }) => {
-            if let Some(segment) = path.segments.last() {
-                if let syn::PathArguments::AngleBracketed(args) = &segment.arguments {
-                    if let Some(syn::GenericArgument::Type(inner_ty)) = args.args.first() {
-                        return Ok(inner_ty.clone());
-                    }
-                }
-            }
-        }
-        _ => {}
-    };
+    if let Type::Path(TypePath { qself: None, path }) = ty
+        && let Some(segment) = path.segments.last()
+        && let syn::PathArguments::AngleBracketed(args) = &segment.arguments
+        && let Some(syn::GenericArgument::Type(inner_ty)) = args.args.first()
+    {
+        return Ok(inner_ty.clone());
+    }
     Err(Error::new(ty.span(), "Expected Reply<T> type"))
 }

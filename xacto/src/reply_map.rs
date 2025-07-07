@@ -11,9 +11,7 @@ pub struct ReplyMap {
 
 impl ReplyMap {
     pub fn new() -> Self {
-        Self {
-            reply_slabs: SendAnyMap::new(),
-        }
+        Self::default()
     }
 
     pub fn get_reply<T: Send + 'static>(&mut self, id: usize) -> Option<Reply<T>> {
@@ -27,5 +25,13 @@ impl ReplyMap {
             anymap::Entry::Vacant(entry) => entry.insert(Slab::new()),
         };
         slab.insert(reply)
+    }
+}
+
+impl Default for ReplyMap {
+    fn default() -> Self {
+        Self {
+            reply_slabs: SendAnyMap::new(),
+        }
     }
 }

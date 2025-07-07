@@ -51,7 +51,7 @@ impl<Msg> Link<Msg> {
             let mut rx = self.rx.clone();
             if let Some(act) = rx.borrow_and_update().as_ref() {
                 let mut local = self.local.write().map_err(|e| {
-                    eprintln!("lock poisoned: {}", e);
+                    eprintln!("lock poisoned: {e:?}");
                     LinkError::Unavailable(())
                 })?;
                 *local = Some(act.clone());
@@ -59,13 +59,15 @@ impl<Msg> Link<Msg> {
             }
         }
 
-        let cached = self.local.read().map_err(|e| {
-            eprintln!("lock poisoned: {}", e);
-            LinkError::Unavailable(())
-        })?;
+        {
+            let cached = self.local.read().map_err(|e| {
+                eprintln!("lock poisoned: {e:?}");
+                LinkError::Unavailable(())
+            })?;
 
-        if let Some(act) = cached.as_ref() {
-            return Ok(act.clone());
+            if let Some(act) = cached.as_ref() {
+                return Ok(act.clone());
+            }
         }
 
         let mut rx = self.rx.clone();
@@ -77,7 +79,7 @@ impl<Msg> Link<Msg> {
         };
 
         let mut local = self.local.write().map_err(|e| {
-            eprintln!("lock poisoned: {}", e);
+            eprintln!("lock poisoned: {e:?}");
             LinkError::Unavailable(())
         })?;
 
@@ -100,26 +102,24 @@ impl<Msg> Link<Msg> {
         }
     }
 
-    #[must_use]
     pub async fn call<T, F>(&self, f: F) -> Result<T, LinkError<(), Msg>>
     where
         T: Send + 'static,
         F: FnOnce(Reply<T>) -> Msg,
     {
         match self.get().await {
-            Ok(act) => act.call(f).await.map_err(|e| LinkError::Call(e.into())),
+            Ok(act) => act.call(f).await.map_err(|e| LinkError::Call(e)),
             Err(e) => Err(e),
         }
     }
 
-    #[must_use]
     pub async fn try_call<T, F>(&self, f: F) -> Result<T, LinkError<(), Msg>>
     where
         T: Send + 'static,
         F: FnOnce(Reply<T>) -> Msg,
     {
         match self.get().await {
-            Ok(act) => act.try_call(f).await.map_err(|e| LinkError::Call(e.into())),
+            Ok(act) => act.try_call(f).await.map_err(|e| LinkError::Call(e)),
             Err(e) => Err(e),
         }
     }

@@ -77,7 +77,6 @@ impl<Msg> Act<Msg> {
         Ok(())
     }
 
-    #[must_use]
     pub async fn call_manually<T, F>(&self, f: F) -> Result<T, CallError<Msg>>
     where
         T: Send + 'static,
@@ -97,7 +96,6 @@ impl<Msg> Act<Msg> {
         }
     }
 
-    #[must_use]
     pub async fn call<T, F>(&self, f: F) -> Result<T, CallError<Msg>>
     where
         T: Send + 'static,
@@ -117,7 +115,6 @@ impl<Msg> Act<Msg> {
         }
     }
 
-    #[must_use]
     pub async fn try_call<T, F>(&self, f: F) -> Result<T, CallError<Msg>>
     where
         T: Send + 'static,
