@@ -1,7 +1,7 @@
 use anymap::{Map, any::Any};
 use slab::Slab;
 
-use crate::act::Reply;
+use crate::Reply;
 
 type SendAnyMap = Map<dyn Any + Send>;
 

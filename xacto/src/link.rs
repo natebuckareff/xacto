@@ -2,10 +2,7 @@ use std::sync::{Arc, RwLock};
 
 use tokio::sync::watch;
 
-use crate::{
-    act::{Act, Reply},
-    actor_error::LinkError,
-};
+use crate::{Act, LinkError, Reply};
 
 pub struct LinkPublisher<Msg> {
     tx: watch::Sender<Option<Act<Msg>>>,

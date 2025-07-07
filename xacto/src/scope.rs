@@ -11,12 +11,7 @@ use tokio::{
 };
 use tokio_util::sync::CancellationToken;
 
-use crate::{
-    ActorSelf,
-    act::Act,
-    actor::{Actor, ActorId},
-    actor_task::{ActorTask, ActorTaskError},
-};
+use crate::{Act, Actor, ActorId, ActorSelf, ActorTask, ActorTaskError};
 
 pub struct ScopeContext {
     next_scope_id: u32,

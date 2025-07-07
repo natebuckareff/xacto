@@ -1,9 +1,6 @@
 use tokio::sync::{mpsc, oneshot};
 
-use crate::{
-    actor::ActorId,
-    actor_error::{CallError, RecvError, SendError},
-};
+use crate::{CallError, RecvError, SendError};
 
 #[derive(Debug)]
 pub struct Reply<T> {

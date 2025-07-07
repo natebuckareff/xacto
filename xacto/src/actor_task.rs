@@ -1,11 +1,7 @@
 use tokio::sync::mpsc;
 use tokio_util::sync::CancellationToken;
 
-use crate::{
-    act::{Act, ActorSignal},
-    actor::Actor,
-    actor_error::ActorError,
-};
+use crate::{Act, Actor, ActorError, ActorSignal};
 
 pub type ActorTaskResult = Result<(), ActorTaskError>;
 
