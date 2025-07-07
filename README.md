@@ -1,4 +1,4 @@
-# Xacto
+# xacto
 
 Erlang-style actors.
 
