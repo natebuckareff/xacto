@@ -79,10 +79,9 @@ async fn main() -> Result<(), ActorError> {
     let act = scope.spawn::<MyActor>(100).await;
 
     let (rx, json1) = {
-        let (tx, rx) = oneshot::channel();
-        let reply = Reply::new(tx);
-        let msg = MyActorMsg::GetCount3("hello".into(), 1000, reply);
-        let env = msg.into_request(&mut reply_map);
+        let (rx, env) =
+            reply_map.create_request(|reply| MyActorMsg::GetCount3("hello".into(), 1000, reply));
+
         (rx, serde_json::to_string(&env).unwrap())
     };
 
@@ -90,9 +89,7 @@ async fn main() -> Result<(), ActorError> {
 
     let json2 = {
         let act_clone = act.clone();
-        let env: RpcEnvelope<<MyActorMsg as RpcMessage>::Request> =
-            serde_json::from_str(&json1).unwrap();
-
+        let env = serde_json::from_str(&json1).unwrap();
         let res = MyActorMsg::proxy_request(env, move |msg| Some((msg, act_clone)))
             .await
             .unwrap()
@@ -104,12 +101,8 @@ async fn main() -> Result<(), ActorError> {
     println!("json2: {}", &json2);
 
     {
-        let env: RpcEnvelope<<MyActorMsg as RpcMessage>::Response> =
-            serde_json::from_str(&json2).unwrap();
-
-        MyActorMsg::proxy_response(env, &mut reply_map)
-            .await
-            .unwrap();
+        let env = serde_json::from_str(&json2).unwrap();
+        reply_map.handle_response::<MyActorMsg>(env).await.unwrap();
     }
 
     {

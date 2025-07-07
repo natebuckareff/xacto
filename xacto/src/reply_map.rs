@@ -1,7 +1,8 @@
 use anymap::{Map, any::Any};
 use slab::Slab;
+use tokio::sync::oneshot;
 
-use crate::Reply;
+use crate::{Reply, RpcEnvelope, RpcMessage};
 
 type SendAnyMap = Map<dyn Any + Send>;
 
@@ -12,6 +13,29 @@ pub struct ReplyMap {
 impl ReplyMap {
     pub fn new() -> Self {
         Self::default()
+    }
+
+    pub fn create_request<F, M, T>(
+        &mut self,
+        f: F,
+    ) -> (oneshot::Receiver<T>, RpcEnvelope<M::Request>)
+    where
+        F: FnOnce(Reply<T>) -> M,
+        M: RpcMessage,
+        T: Send + 'static,
+    {
+        let (tx, rx) = oneshot::channel();
+        let reply = Reply::new(tx);
+        let msg = f(reply);
+        let env = msg.into_request(self);
+        (rx, env)
+    }
+
+    pub async fn handle_response<M>(&mut self, env: RpcEnvelope<M::Response>) -> Result<(), ()>
+    where
+        M: RpcMessage,
+    {
+        M::proxy_response(env, self).await
     }
 
     pub fn get_reply<T: Send + 'static>(&mut self, id: usize) -> Option<Reply<T>> {
