@@ -1,7 +1,7 @@
 use tokio::sync::mpsc;
 use tokio_util::sync::CancellationToken;
 
-use crate::{Act, Actor, ActorError, ActorSignal};
+use crate::{Act, Actor, ActorError, ActorId, ActorSignal};
 
 pub type ActorTaskResult = Result<(), ActorTaskError>;
 
@@ -18,6 +18,10 @@ impl<A: Actor> ActorSelf<A> {
         cancel: CancellationToken,
     ) -> Self {
         Self { act, rx, cancel }
+    }
+
+    pub fn id(&self) -> ActorId {
+        self.act.id()
     }
 
     pub fn act(&self) -> &Act<A::Msg> {

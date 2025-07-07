@@ -1,6 +1,6 @@
 use tokio::sync::{mpsc, oneshot};
 
-use crate::{CallError, RecvError, SendError};
+use crate::{ActorId, CallError, RecvError, SendError};
 
 #[derive(Debug)]
 pub struct Reply<T> {
@@ -31,18 +31,23 @@ impl<M> ActorSignal<M> {
 }
 
 pub struct Act<Msg> {
+    id: ActorId,
     tx: mpsc::Sender<ActorSignal<Msg>>,
 }
 
 impl<Msg> std::fmt::Debug for Act<Msg> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "Act")
+        write!(f, "Act({:?})", self.id)
     }
 }
 
 impl<Msg> Act<Msg> {
-    pub fn new(tx: mpsc::Sender<ActorSignal<Msg>>) -> Self {
-        Self { tx }
+    pub fn new(id: ActorId, tx: mpsc::Sender<ActorSignal<Msg>>) -> Self {
+        Self { id, tx }
+    }
+
+    pub fn id(&self) -> ActorId {
+        self.id
     }
 
     pub fn tx(&self) -> mpsc::Sender<ActorSignal<Msg>> {
@@ -143,6 +148,7 @@ impl<Msg> Act<Msg> {
 impl<Msg> Clone for Act<Msg> {
     fn clone(&self) -> Self {
         Self {
+            id: self.id,
             tx: self.tx.clone(),
         }
     }

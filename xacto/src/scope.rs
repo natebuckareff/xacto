@@ -73,6 +73,10 @@ impl Scope {
         }
     }
 
+    pub fn id(&self) -> u32 {
+        self.id
+    }
+
     pub fn child_scope(&mut self) -> Scope {
         let id = {
             let mut context = self.context.lock().unwrap();
@@ -99,7 +103,7 @@ impl Scope {
         self.next_actor_id += 1;
 
         let (tx, rx) = mpsc::channel(100);
-        let act = Act::new(tx.clone());
+        let act = Act::new(id, tx.clone());
         let cancel = self.cancel.child_token();
 
         let this = ActorSelf::new(act.clone(), rx, cancel.clone());
