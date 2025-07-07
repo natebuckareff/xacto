@@ -19,3 +19,7 @@ path = "end_to_end_rpc_test.rs"
 [[example]]
 name = "ping_pong_basic"
 path = "ping_pong_basic.rs"
+
+[[example]]
+name = "call_basic"
+path = "call_basic.rs"
