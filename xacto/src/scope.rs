@@ -132,7 +132,7 @@ impl Scope {
 
     pub fn exit_actor(&mut self, id: ActorId) {
         if let Some(state) = self.actors.get_mut(&id) {
-            state.handle.abort();
+            state.cancel.cancel();
         }
     }
 
